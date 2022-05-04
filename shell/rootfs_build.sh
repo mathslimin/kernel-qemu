@@ -33,7 +33,8 @@ sudo mkdir -p rootfs/usr # /usr包含所有用户的二进制文件和库文件�
 sudo mkdir -p rootfs/dev/ # /dev用于存放设备文件
 
 # 3.将busybox中的编译的可执行文件放到rootfs下
-sudo cp -arf ${BUSY_BOX}/_install/*  rootfs/
+#sudo cp -arf ${BUSY_BOX}/_install/*  rootfs/
+sudo cp -arf ${SRC_DIR}/rootfs/arm/_install/*  rootfs/ 
 sudo cp -arf ${ETC} rootfs/
 
 # 4.添加交叉编译环境
