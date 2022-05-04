@@ -34,10 +34,11 @@ function arm_usage(){
 
 function make_arm_zImage(){
     cd $SRC_DIR/linux-5.6.11
-	make vexpress_defconfig 
-	#cp ../configs/arch/arm/configs/qemu_defconfig arch/arm/configs/
-	#make qemu_defconfig
-    make -j12 zImage
+	#make vexpress_defconfig 
+	cp ../configs/arch/arm/configs/qemu_defconfig arch/arm/configs/
+	make qemu_defconfig
+    #make -j12 zImage
+    make bzImage -j$(nproc)
 	make dtbs
 	make modules
     echo "generate zImage dts succeed"
@@ -48,7 +49,7 @@ function make_arm_uImage(){
    export LOADADDR=0x60003000
    cd $SRC_DIR/linux-5.6.11
    make vexpress_defconfig
-   make -j12 uImage
+   make -j$(nproc) uImage
    make dtbs
    make modules
    echo "generate uImage succeed"
@@ -57,14 +58,16 @@ function make_arm_uImage(){
 function make_arm_boot(){
    cd $SRC_DIR/u-boot-2020.04
    make vexpress_ca9x4_defconfig
-   make -j12
+   make -j$(nproc)
    echo "generate uboot succeed"
 }
 
 function make_arm_busybox(){
    cd $SRC_DIR/busybox-1.31.1
-   make menuconfig
-   make -j12
+   cp ../configs/busybox/configs/qemu_arm_defconfig configs/
+   make qemu_arm_defconfig 
+  #make menuconfig
+   make -j$(nproc)
    make install
    echo "generate busybox succeed"
 }
@@ -87,26 +90,27 @@ function debug_arm_boot(){
 
 function run_arm_zImage(){
    sudo qemu-system-arm -M vexpress-a9 -m 512M -dtb $dtb_obj -kernel $zImage_obj -smp 4\
-  	 -append "root=/dev/mmcblk0 rw rootwait earlyprintk console=tty0" -sd $rootfs_obj\
-       -net nic -net tap,ifname=tap0,script=no,downscript=no
+  	 -append "root=/dev/mmcblk0 rw console=ttyAMA0 loglevel=8" -sd $rootfs_obj\
+       -net nic -net tap,ifname=tap0,script=no,downscript=no -nographic
     # sudo qemu-system-arm -M vexpress-a9 \
 	# -smp 4 \
 	# -m 1024m \
 	# -kernel $zImage_obj \
 	# -append "root=/dev/mmcblk0 rw console=ttyAMA0 loglevel=8" \
 	# -dtb $dtb_obj \
-	# -sd $rootfs_obj
+	# -sd $rootfs_obj \
+    # -nographic
 }
 
 function run_arm_zImage_backup(){
    sudo qemu-system-arm -M vexpress-a9 -m 512M -dtb $dtb_obj -kernel $zImage_obj -smp 4\
   	 -append "root=/dev/mmcblk0 rw rootwait earlyprintk console=tty0 init=/linuxrc" -sd $rootfs_obj\
-       -net nic -net tap,ifname=tap0,script=no,downscript=no
+       -net nic -net tap,ifname=tap0,script=no,downscript=no 
 }
 
 
 function debug_arm_zImage(){
    sudo qemu-system-arm -S -s -M vexpress-a9 -m 512M -dtb $dtb_obj -kernel $zImage_obj -smp 4\
   	 -append "root=/dev/mmcblk0 rw rootwait earlyprintk console=tty0 init=/linuxrc" -sd $rootfs_obj\
-       -net nic -net tap,ifname=tap0,script=no,downscript=no
+       -net nic -net tap,ifname=tap0,script=no,downscript=no -nographic
 }
