@@ -19,9 +19,6 @@ tar zxvf linux-5.6.11.tar.gz
 
 * vexpress-a9
 
-## **snap**
-
-![snap](./doc/images/snap-environment.png)
 
 ## **usage**
 
